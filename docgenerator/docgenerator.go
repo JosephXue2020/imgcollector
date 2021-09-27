@@ -244,6 +244,12 @@ func download(url string, tempdir string) (string, bool) {
 func getParas(meta []Meta) []office.Para {
 	var paras []office.Para
 	for _, m := range meta {
+		// 没图片的不管
+
+		if len(m.urls) == 0 {
+			continue
+		}
+
 		// 条头
 		para := office.Para{Typ: "text", Text: "条目名称：" + m.title}
 		paras = append(paras, para)
@@ -285,6 +291,8 @@ func GenDocx(direc string, docxPath string, tempdir string) *document.Document {
 	metas := []Meta{}
 
 	// 主循环
+	tot := len(fInfo)
+	count := 1
 	for _, item := range fInfo {
 		// 解析entry xml
 		fp := item[2]
@@ -304,6 +312,9 @@ func GenDocx(direc string, docxPath string, tempdir string) *document.Document {
 		}
 		mt := Meta{title: t, urls: urls, successDownload: flags, localPath: picPaths}
 		metas = append(metas, mt)
+
+		fmt.Print("\r处理条目进度：" + strconv.Itoa(count) + "/" + strconv.Itoa(tot))
+		count += 1
 	}
 
 	// 生成docx
